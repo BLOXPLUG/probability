@@ -25,12 +25,15 @@ export namespace Weight {
 	}
 
 	export function getRandom<T>(choices: T[], weights: number[], random = new Random()): T | undefined {
+		const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
+		if (totalWeight === 0) return undefined;
+		const normalizedWeights = weights.map((weight) => weight / totalWeight);
+
 		let counter = random.NextNumber(0, 1);
-		// eslint-disable-next-line roblox-ts/no-array-pairs
-		for (const [key, weight] of pairs(weights)) {
-			counter -= weight;
+		for (let i = 0; i < normalizedWeights.size(); i++) {
+			counter -= normalizedWeights[i];
 			if (counter <= 0) {
-				return choices[key - 1] as T;
+				return choices[i];
 			}
 		}
 	}
